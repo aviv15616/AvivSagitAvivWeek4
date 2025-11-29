@@ -1,0 +1,91 @@
+@startuml Bowling2_Architecture
+!theme plain
+
+package "Bowling2 Game" {
+    class GameManager {
+        - levelManager: LevelManager
+        - uiManager: UIManager
+        - bowlingLane: BowlingLane
+        - currentRoll: int
+        - fallenInFirstRoll: int
+        - subscribedBallController: BallController
+        + StartLevel()
+        + OnBallStopped()
+        + LevelCompleted()
+        + LevelFailed()
+        - SubscribeToCurrentBall()
+    }
+
+    class LevelManager {
+        - levelLayouts: GameObject[]
+        - currentLayoutInstance: GameObject
+        - bottleManager: BottleManager
+        - CurrentLevelIndex: int
+        + LoadLevel()
+        + NextLevel()
+        + BottleManager: BottleManager
+    }
+
+    class BowlingLane {
+        - ballPrefab: GameObject
+        - ballSpawnPoint: Transform
+        - currentBall: GameObject
+        + SpawnBall()
+        + ResetLane()
+        + CurrentBall: GameObject
+    }
+
+    class BallController {
+        - rb: Rigidbody
+        - rollForce: float
+        - rollAction: InputAction
+        - velocityThreshold: float
+        - minTimeBeforeStop: float
+        - hasRolled: bool
+        - rollTime: float
+        - lastPosition: Vector3
+        - stationaryTime: float
+        + OnBallStopped: Action
+        + RollBall()
+        + OnReset()
+        - Update()
+    }
+
+    class BottleManager {
+        - bottles: Bottle[]
+        + CountFallen(): int
+        + RemoveFallen()
+        + AllCleared(): bool
+        + Bottles: Bottle[]
+    }
+
+    class Bottle {
+        - FALL_ANGLE: float
+        - FALL_HEIGHT: float
+        + IsFallen(): bool
+    }
+
+    class UIManager {
+        + UpdateLevel(levelIndex: int)
+        + UpdateScore(fallen: int)
+        + ShowMessage(message: string)
+    }
+
+    ' Relationships
+    GameManager --> LevelManager
+    GameManager --> UIManager
+    GameManager --> BowlingLane
+    GameManager --> BallController
+
+    LevelManager --> BottleManager
+    LevelManager --> "levelLayouts[]" GameObject
+
+    BowlingLane --> BallController
+    BowlingLane --> "ballPrefab" GameObject
+
+    BottleManager --> "bottles[]" Bottle
+
+    BallController --> Rigidbody
+}
+
+@enduml
