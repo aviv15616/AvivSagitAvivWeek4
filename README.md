@@ -1,128 +1,99 @@
-# Bowling2
+# Bowling Challenge 🎳  
+A physics-based bowling mini-game created for a Game Development course.
 
-A simple bowling game made with Unity.
-[click here to play on itch](https://gamedevteamx.itch.io/sagitweek4)
+---
 
-## How to Run
+## 🎮 Overview
 
-1. Open Scens\BowlingScene
-2. Hit Play
-3. Hit space on keyboard
+Bowling Challenge is a compact bowling game built in Unity.  
+It includes realistic physics for both the ball and the pins, multi-attempt gameplay per level, and UI feedback for score, attempts, and level progression.
 
-## Class Relations
-```
-GameManager
-├─ LevelManager (loads levels, manages bottles)
-├─ UIManager (displays score and messages)
-└─ BowlingLane (spawns/reuses ball)
-└─ BallController (detects when ball stops)
+The project demonstrates:
+- RigidBody physics  
+- Mouse-based aiming and power charging  
+- Level logic (two throws per level)  
+- Object management (ball, pins, lane)  
+- Modular UI system  
+- Smart reset between throws  
 
-LevelManager
-└─ BottleManager (tracks bottles)
-└─ Bottle[] (individual bottles, checks if fallen)
-```
+---
 
-**Key Flow:**
-1. GameManager starts a level via LevelManager
-2. BowlingLane spawns the ball
-3. Player rolls via BallController
-4. Ball stops → BallController fires OnBallStopped event
-5. GameManager calls BottleManager.CountFallen()
-6. UIManager displays the result
+## 🕹️ How to Play
 
-## Architecture Assumptions
+1. Aim the ball by moving the mouse.  
+2. Hold **SPACE** to charge the throw power.  
+3. Release **SPACE** to roll the ball.  
+4. You have *two attempts* to knock down all the pins.  
+5. If all pins are cleared → the game loads the next level.  
+6. Clear all levels → **YOU WIN!**
 
-- **Ball reuse:** The ball is reused between rolls (repositioned) instead of destroyed/respawned to avoid hiccups.
-- **Single BottleManager per level:** Each level layout has one BottleManager that finds all Bottle children via `GetComponentsInChildren()`.
-- **Stop detection:** Ball is considered stopped when it moves very little (`stationaryTime >= 0.25s` and `velocity < 0.15`) for at least 1 second after rolling.
-- **Fallen criteria:** A bottle is fallen if its Y position drops below 1.35 OR it tips over (angle > 45°).
-- **UI updates on stop:** Score only updates when the ball physically stops, not before.
+---
 
+## 🧩 Project Structure
 
-## UML
-```mermaid
-classDiagram
-    class GameManager {
-        - levelManager: LevelManager
-        - uiManager: UIManager
-        - bowlingLane: BowlingLane
-        - currentRoll: int
-        - fallenInFirstRoll: int
-        - subscribedBallController: BallController
-        + StartLevel()
-        + OnBallStopped()
-        + LevelCompleted()
-        + LevelFailed()
-        - SubscribeToCurrentBall()
-    }
+### **GameManager**
+- Controls the main flow of the game  
+- Spawns the ball at the start of each level  
+- Listens for the “ball launched” event  
+- Detects when the ball stops  
+- Decides whether to retry, reset, or advance to the next level  
 
-    class LevelManager {
-        - levelLayouts: GameObject[]
-        - currentLayoutInstance: GameObject
-        - bottleManager: BottleManager
-        - CurrentLevelIndex: int
-        + LoadLevel()
-        + NextLevel()
-        + BottleManager(): BottleManager
-    }
+### **LevelManager**
+- Loads level data  
+- Tracks number of throws  
+- Knows when the level is complete or failed  
 
-    class BowlingLane {
-        - ballPrefab: GameObject
-        - ballSpawnPoint: Transform
-        - currentBall: GameObject
-        + SpawnBall()
-        + ResetLane()
-        + CurrentBall(): GameObject
-    }
+### **BottleManager (Pins)**
+- Finds pins in the scene  
+- Detects fallen pins based on angle and position  
+- Removes fallen pins  
+- Resets standing pins between throws to avoid late collisions  
 
-    class BallController {
-        - rb: Rigidbody
-        - rollForce: float
-        - rollAction: InputAction
-        - velocityThreshold: float
-        - minTimeBeforeStop: float
-        - hasRolled: bool
-        - rollTime: float
-        - lastPosition: Vector3
-        - stationaryTime: float
-        + OnBallStopped: Action
-        + RollBall()
-        + OnReset()
-        - Update()
-    }
+### **BowlingLane**
+- Spawns the ball at a defined location  
+- Resets the ball between attempts  
 
-    class BottleManager {
-        - bottles: Bottle[]
-        + CountFallen(): int
-        + RemoveFallen()
-        + AllCleared(): bool
-        + Bottles(): Bottle[]
-    }
+### **UIManager**
+- Displays the number of fallen pins  
+- Shows the current level  
+- Displays messages and instructions  
+- Shows the final “YOU WON!” message  
 
-    class Bottle {
-        - FALL_ANGLE: float
-        - FALL_HEIGHT: float
-        + IsFallen(): bool
-    }
+---
 
-    class UIManager {
-        + UpdateLevel(levelIndex: int)
-        + UpdateScore(fallen: int)
-        + ShowMessage(message: string)
-    }
+## 🚀 Running the Game
 
-    %% Relationships
-    GameManager --> LevelManager
-    GameManager --> UIManager
-    GameManager --> BowlingLane
-    GameManager --> BallController
+1. Open Unity (2021 or later recommended).  
+2. Load the project folder.  
+3. Open the scene **MainScene**.  
+4. Press **Play**.
 
-    LevelManager --> BottleManager
-    LevelManager --> "levelLayouts[]" GameObject
+---
 
-    BowlingLane --> BallController
-    BowlingLane --> "ballPrefab" GameObject
+## 📁 Important Files
 
-    BottleManager --> "bottles[]" Bottle
+- `GameManager.cs`  
+- `LevelManager.cs`  
+- `BottleManager.cs`  
+- `BowlingLane.cs`  
+- `BallController.cs`  
+- `UIManager.cs`
 
-    BallController --> Rigidbody
+---
+
+## 🎯 Assignment Requirements
+
+This project includes:
+- Power-based ball launch system  
+- Two attempts per level  
+- Correct level logic  
+- Full pin physics  
+- UI synchronization  
+- Automatic cleanup and reset of pins between attempts  
+- Final win screen  
+
+---
+## ITCH.IO
+
+https://gamedevteamx.itch.io/avivsagitavivweek4
+
